@@ -14,6 +14,7 @@ const statusEl = document.getElementById('admin-status')
 const contactContainer = document.getElementById('admin-contact')
 const serviceContainer = document.getElementById('admin-service')
 const adminData = document.querySelector('.admin-data')
+let currentSession = null
 
 const contactColumns = [
   { label: 'Submitted', key: 'created_at', type: 'date' },
@@ -57,6 +58,17 @@ const setStatus = (state, message) => {
 const setTableMessage = (container, message) => {
   if (!container) return
   container.innerHTML = `<p class="admin-empty">${message}</p>`
+}
+
+const isAuthError = (error) => {
+  if (!error) return false
+  const message = String(error.message || '').toLowerCase()
+  return error.code === '42501'
+    || error.status === 401
+    || error.status === 403
+    || message.includes('permission')
+    || message.includes('rls')
+    || message.includes('not authorized')
 }
 
 const renderTable = (container, columns, rows) => {
@@ -104,9 +116,16 @@ const loadSubmissions = async () => {
     .order('created_at', { ascending: false })
     .limit(100)
 
+  const contactAuthError = isAuthError(contactError)
+
   if (contactError) {
     console.error(contactError)
-    setTableMessage(contactContainer, 'Unable to load contact messages.')
+    setTableMessage(
+      contactContainer,
+      contactAuthError
+        ? (currentSession ? 'This account cannot view contact messages.' : 'Sign in to view submissions.')
+        : 'Unable to load contact messages.'
+    )
   } else {
     renderTable(contactContainer, contactColumns, contactRows)
   }
@@ -117,29 +136,32 @@ const loadSubmissions = async () => {
     .order('created_at', { ascending: false })
     .limit(100)
 
+  const serviceAuthError = isAuthError(serviceError)
+
   if (serviceError) {
     console.error(serviceError)
-    setTableMessage(serviceContainer, 'Unable to load service requests.')
+    setTableMessage(
+      serviceContainer,
+      serviceAuthError
+        ? (currentSession ? 'This account cannot view service requests.' : 'Sign in to view submissions.')
+        : 'Unable to load service requests.'
+    )
   } else {
     renderTable(serviceContainer, serviceColumns, serviceRows)
+  }
+
+  if (adminData) {
+    const locked = contactAuthError && serviceAuthError
+    adminData.classList.toggle('is-locked', locked)
   }
 }
 
 const updateAuthUI = (session) => {
-  const locked = !session
-  if (adminData) {
-    adminData.classList.toggle('is-locked', locked)
-  }
+  currentSession = session
   if (logoutButton) {
-    logoutButton.disabled = locked
+    logoutButton.disabled = !session
   }
-
-  if (locked) {
-    setTableMessage(contactContainer, 'Sign in to view submissions.')
-    setTableMessage(serviceContainer, 'Sign in to view submissions.')
-  } else {
-    loadSubmissions()
-  }
+  loadSubmissions()
 }
 
 const handleLogin = async (event) => {
