@@ -619,6 +619,88 @@ main {
   gap: 0.9rem;
 }
 
+.admin-grid {
+  display: grid;
+  gap: 1.6rem;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+}
+
+.admin-card {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-data.is-locked {
+  opacity: 0.7;
+}
+
+.admin-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.admin-section {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.admin-section + .admin-section {
+  margin-top: 1.6rem;
+}
+
+.admin-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-table {
+  overflow-x: auto;
+}
+
+.admin-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 0.7rem 0.6rem;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+}
+
+.admin-table th {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(27, 107, 255, 0.05);
+}
+
+.admin-empty {
+  color: var(--muted);
+  margin: 0;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--line-soft);
@@ -854,6 +936,10 @@ main {
   }
 
   .map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-grid {
     grid-template-columns: 1fr;
   }
 
